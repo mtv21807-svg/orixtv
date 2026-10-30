@@ -1,1 +1,48 @@
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORIX TV</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10131b;color:white;font-family:Arial,sans-serif}
+header{background:#191f2d;padding:20px;text-align:center}
+h1{margin:0;color:#00d9ff}
+main{padding:16px;max-width:850px;margin:auto}
+video{width:100%;background:black;border-radius:10px}
+button{background:#087eae;color:white;border:0;padding:15px;border-radius:8px;font-size:16px;width:100%;margin-top:12px}
+#estado{color:#ffd166;margin-top:12px}
+</style>
+</head>
+<body>
+<header><h1>ORIX TV</h1><p>Televisión en vivo</p></header>
+<main>
+<h2>Canales disponibles</h2>
+<video id="video" controls playsinline></video>
+<button onclick="reproducir()">▶ EL TRECE</button>
+<p id="estado">Seleccioná un canal para comenzar.</p>
+</main>
+<script>
+const url="https://live-01-02-eltrece.vodgc.net/eltrecetv/index.m3u8";
+function reproducir(){
+ const video=document.getElementById("video");
+ const estado=document.getElementById("estado");
+ estado.textContent="Conectando con EL TRECE...";
+ if(Hls.isSupported()){
+  const hls=new Hls();
+  hls.loadSource(url);
+  hls.attachMedia(video);
+  hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play().catch(()=>estado.textContent="Tocá Play en el reproductor."));
+  hls.on(Hls.Events.ERROR,()=>estado.textContent="No se pudo reproducir. Puede ser un problema del enlace o del servidor.");
+ }else if(video.canPlayType("application/vnd.apple.mpegurl")){
+  video.src=url;
+  video.play().catch(()=>estado.textContent="Tocá Play en el reproductor.");
+ }else{
+  estado.textContent="Este navegador no admite reproducción HLS.";
+ }
+}
+</script>
+</body>
+  </html>
