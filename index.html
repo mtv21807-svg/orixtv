@@ -1,48 +1,22 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ORIX TV</title>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#08111f"><title>ORIX TV</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#10131b;color:white;font-family:Arial,sans-serif}
-header{background:#191f2d;padding:20px;text-align:center}
-h1{margin:0;color:#00d9ff}
-main{padding:16px;max-width:850px;margin:auto}
-video{width:100%;background:black;border-radius:10px}
-button{background:#087eae;color:white;border:0;padding:15px;border-radius:8px;font-size:16px;width:100%;margin-top:12px}
-#estado{color:#ffd166;margin-top:12px}
-</style>
-</head>
-<body>
-<header><h1>ORIX TV</h1><p>Televisión en vivo</p></header>
-<main>
-<h2>Canales disponibles</h2>
-<video id="video" controls playsinline></video>
-<button onclick="reproducir()">▶ EL TRECE</button>
-<p id="estado">Seleccioná un canal para comenzar.</p>
-</main>
-<script>
-const url="https://live-01-02-eltrece.vodgc.net/eltrecetv/index.m3u8";
-function reproducir(){
- const video=document.getElementById("video");
- const estado=document.getElementById("estado");
- estado.textContent="Conectando con EL TRECE...";
- if(Hls.isSupported()){
-  const hls=new Hls();
-  hls.loadSource(url);
-  hls.attachMedia(video);
-  hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play().catch(()=>estado.textContent="Tocá Play en el reproductor."));
-  hls.on(Hls.Events.ERROR,()=>estado.textContent="No se pudo reproducir. Puede ser un problema del enlace o del servidor.");
- }else if(video.canPlayType("application/vnd.apple.mpegurl")){
-  video.src=url;
-  video.play().catch(()=>estado.textContent="Tocá Play en el reproductor.");
- }else{
-  estado.textContent="Este navegador no admite reproducción HLS.";
- }
-}
-</script>
-</body>
-  </html>
+:root{color-scheme:dark;--bg:#08111f;--panel:#111e31;--line:#263b57;--blue:#28b8ff;--muted:#9fb2ca}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f4f8ff;font:16px system-ui,Arial,sans-serif}header{padding:20px max(16px,calc((100vw - 1150px)/2));background:linear-gradient(120deg,#102e50,#101827);border-bottom:1px solid var(--line)}h1{margin:0;font-size:clamp(24px,4vw,34px)}header p{margin:5px 0 0;color:#b7c9df}main{max-width:1150px;margin:auto;padding:16px;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(270px,1fr);gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}.player{padding:12px}.screen{aspect-ratio:16/9;background:#000;border-radius:9px;overflow:hidden}video{width:100%;height:100%;background:#000}.now{font-weight:700;margin:12px 2px 5px}.status{font-size:13px;color:var(--muted);min-height:38px;line-height:1.45}.actions{display:flex;gap:8px;margin-top:8px}button{border:0;border-radius:9px;background:var(--blue);color:#041321;font-weight:700;padding:11px 14px;cursor:pointer}.secondary{background:#2a3b54;color:#fff}.list{padding:12px}.list h2{font-size:18px;margin:2px 0 10px}.count{color:var(--muted);font-size:13px;font-weight:400}.search{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:#091525;color:#fff;margin-bottom:10px;font-size:16px}#channels{max-height:580px;overflow:auto;display:grid;gap:6px}.channel{width:100%;text-align:left;background:#1a2b43;color:#eef5ff;border:1px solid transparent;padding:11px;border-radius:8px;font-weight:500}.channel.active,.channel:hover{border-color:var(--blue);background:#203c59}.num{color:#71cfff;margin-right:9px}.note{max-width:1150px;margin:0 auto 22px;padding:0 16px;color:#9fb2ca;font-size:12px;line-height:1.5}@media(max-width:760px){main{grid-template-columns:1fr;padding:10px}#channels{max-height:380px}}
+</style></head><body>
+<header><h1>📺 ORIX TV</h1><p>Televisión en vivo · Elegí un canal para reproducir</p></header>
+<main><section class="panel player"><div class="screen"><video id="video" controls playsinline></video></div><div class="now" id="now">Ningún canal seleccionado</div><div class="status" id="status">Seleccioná un canal de la lista.</div><div class="actions"><button id="retry">Reintentar</button><button class="secondary" id="stop">Detener</button></div></section>
+<section class="panel list"><h2>Canales disponibles <span class="count" id="count"></span></h2><input class="search" id="search" type="search" placeholder="Buscar canal…" autocomplete="off"><div id="channels"></div></section></main>
+<div class="note">Compatibilidad: los enlaces de esta lista son transmisiones MPEG-TS por HTTP. En una página HTTPS, Chrome puede bloquearlos por contenido mixto; también depende de que el servidor permita CORS. El reproductor no puede corregir esas restricciones por sí solo.</div>
+<script src="https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js"></script><script>
+const channels = [{"name":"5TV","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712700.ts"},{"name":"A24 | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712701.ts"},{"name":"A24 FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712702.ts"},{"name":"America TV | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712703.ts"},{"name":"America TV FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712704.ts"},{"name":"C5N FHD| AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712705.ts"},{"name":"CRONICA","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712706.ts"},{"name":"Crónica TV  HD| AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712707.ts"},{"name":"El Nueve","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712708.ts"},{"name":"El Nueve HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712709.ts"},{"name":"El Trece","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712710.ts"},{"name":"El Trece FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712711.ts"},{"name":"La Nación + | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712712.ts"},{"name":"La Nación + HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712713.ts"},{"name":"TELEFE","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712714.ts"},{"name":"Telefe FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712715.ts"},{"name":"TN Noticias","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712717.ts"},{"name":"TN NOTICIAS","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712718.ts"},{"name":"TV Publica","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712719.ts"},{"name":"TV Publica FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712720.ts"},{"name":"ARGENTINISIMA","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712721.ts"},{"name":"Canal 13 La Rioja","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712723.ts"},{"name":"Canal 26 | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712724.ts"},{"name":"Canal 26 FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712725.ts"},{"name":"Canal 4 Posadas","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712726.ts"},{"name":"Canal 7 Jujuy","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712727.ts"},{"name":"Canal 9 Litoral","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712728.ts"},{"name":"13 Max HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712730.ts"},{"name":"CIUDAD MAGAZINE HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712732.ts"},{"name":"5RTV Santa Fe","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712733.ts"},{"name":"Multivision HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712734.ts"},{"name":"Neo TV","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712735.ts"},{"name":"NET TV","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712736.ts"},{"name":"Paka Paka HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712737.ts"},{"name":"RTN Neuquén","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712739.ts"},{"name":"Telemax","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712740.ts"},{"name":"Volver HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712741.ts"},{"name":"Deportv | AR FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712742.ts"},{"name":"ESPN FHD | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712743.ts"},{"name":"ESPN 2  FHD | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712744.ts"},{"name":"ESPN 3 HD| AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712745.ts"},{"name":"ESPN 4 HD | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712746.ts"},{"name":"ESPN Premium  | AR FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712747.ts"},{"name":"Fox Sports | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712748.ts"},{"name":"Fox Sports 2  | AR FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712749.ts"},{"name":"Fox Sports 3  | AR FHD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712750.ts"},{"name":"Garage TV","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712751.ts"},{"name":"TNT Sports Premium","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712752.ts"},{"name":"TNT Sports Premium HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712753.ts"},{"name":"TyC Sports","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712754.ts"},{"name":"TYC SPORTS HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712755.ts"},{"name":"DSPORTS 1 ARG","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712756.ts"},{"name":"DSPORTS 2 ARG","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/712757.ts"},{"name":"DSPORTS +1 AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/722195.ts"},{"name":"TYC SPORTS INTERNACIONAL","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/722820.ts"},{"name":"Cine Ar | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/772967.ts"},{"name":"Allegro | AR HD","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/772968.ts"},{"name":"Canal 9 - Imagen del nordeste | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/772969.ts"},{"name":"CM - El Canal de la Música | AR","url":"http://avefenixtv.com:8080/live/DanielGomez23/Daniel2023G/773022.ts"}];
+const video=document.getElementById('video'),statusEl=document.getElementById('status'),now=document.getElementById('now'),list=document.getElementById('channels'),search=document.getElementById('search'),count=document.getElementById('count');
+let player=null,selected=null;
+function stop(){if(player){try{player.pause();player.unload();player.detachMediaElement();player.destroy()}catch(e){}player=null}video.pause();video.removeAttribute('src');video.load()}
+function play(ch){selected=ch;stop();now.textContent=ch.name;document.querySelectorAll('.channel').forEach(b=>b.classList.toggle('active',b.dataset.url===ch.url));
+ if(location.protocol==='https:'&&ch.url.startsWith('http:')){statusEl.textContent='Este enlace usa HTTP y la página usa HTTPS. Chrome puede bloquearlo por contenido mixto; hace falta un proxy HTTPS que funcione.';return}
+ if(!window.mpegts||!mpegts.isSupported()){statusEl.textContent='Este navegador no soporta MPEG-TS mediante MSE.';return}
+ statusEl.textContent='Conectando con '+ch.name+'…';
+ try{player=mpegts.createPlayer({type:'mpegts',isLive:true,url:ch.url},{enableWorker:true,enableStashBuffer:false,stashInitialSize:128});player.attachMediaElement(video);player.on(mpegts.Events.ERROR,(type,detail,info)=>{statusEl.textContent='No se pudo reproducir ('+detail+'). Revisá disponibilidad del enlace y permisos CORS del servidor.'});player.load();video.play().then(()=>statusEl.textContent='Reproduciendo: '+ch.name).catch(()=>statusEl.textContent='Tocá ▶ en el video para iniciar.');}catch(e){statusEl.textContent='Error al iniciar: '+e.message}}
+function render(){const q=search.value.trim().toLocaleLowerCase('es');const filtered=channels.filter(c=>c.name.toLocaleLowerCase('es').includes(q));list.innerHTML='';count.textContent='('+filtered.length+' / '+channels.length+')';filtered.forEach(ch=>{const b=document.createElement('button');b.className='channel'+(selected&&selected.url===ch.url?' active':'');b.dataset.url=ch.url;const n=document.createElement('span');n.className='num';n.textContent=String(channels.indexOf(ch)+1).padStart(2,'0');b.append(n,document.createTextNode(ch.name));b.onclick=()=>play(ch);list.appendChild(b)})}
+search.addEventListener('input',render);document.getElementById('retry').onclick=()=>selected&&play(selected);document.getElementById('stop').onclick=()=>{stop();selected=null;now.textContent='Reproducción detenida';statusEl.textContent='Elegí otro canal para continuar.';render()};render();
+</script></body></html>
