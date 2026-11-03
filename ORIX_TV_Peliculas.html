@@ -17,17 +17,16 @@ input,select{padding:11px;border:1px solid #454650;border-radius:8px;background:
 #estado{font-size:13px;color:#ccc;margin-top:10px}
 main{padding:14px}
 #catalogo{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:13px}
-.card{overflow:hidden;background:#1b1c22;border:1px solid #30313a;border-radius:10px;cursor:pointer;transition:transform .12s}
-.card:active{transform:scale(.98)}
+.card{overflow:hidden;background:#1b1c22;border:1px solid #30313a;border-radius:10px;cursor:pointer}
 .poster{width:100%;aspect-ratio:2/3;object-fit:cover;background:#292a32;display:block}
 .noPoster{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;background:#292a32;font-size:45px}
 .titulo{padding:9px 9px 4px;font-size:14px;line-height:1.35;overflow-wrap:anywhere;min-height:52px}
 .grupo{padding:0 9px 10px;font-size:11px;color:#aaa}
 #modal{display:none;position:fixed;inset:0;z-index:8;background:#000e;padding:12px;overflow:auto}
 .caja{max-width:1000px;margin:3vh auto;background:#17181d;padding:12px;border-radius:10px}
-video{width:100%;max-height:70vh;background:#000;display:block}
+video{width:100%;max-height:78vh;background:#000;display:block}
 #err{color:#ffd3a3;line-height:1.45;font-size:14px}
-.cerrar{font-size:14px;padding:10px 16px;border:0;border-radius:7px;background:#444;color:#fff}
+.cerrar{margin-top:10px;padding:10px 16px;border:0;border-radius:7px;background:#444;color:#fff;font-size:15px}
 </style>
 </head>
 <body>
@@ -43,12 +42,12 @@ video{width:100%;max-height:70vh;background:#000;display:block}
 <main><div id="catalogo"></div></main>
 
 <div id="modal" role="dialog" aria-modal="true">
-<div class="caja">
-<h2 id="tituloVideo">Película</h2>
-<video id="video" controls playsinline preload="metadata"></video>
-<p id="err">Cargando película…</p>
-<button class="cerrar" onclick="cerrar()">Cerrar</button>
-</div>
+ <div class="caja">
+  <h2 id="tituloVideo">Película</h2>
+  <video id="video" controls playsinline preload="metadata"></video>
+  <p id="err"></p>
+  <button class="cerrar" onclick="cerrar()">Cerrar</button>
+ </div>
 </div>
 
 <script>
@@ -61,6 +60,7 @@ const estado=document.getElementById('estado');
 const modal=document.getElementById('modal');
 const video=document.getElementById('video');
 const err=document.getElementById('err');
+const tituloVideo=document.getElementById('tituloVideo');
 
 [...new Set(peliculas.map(p=>p.group).filter(Boolean))].sort().forEach(g=>{
  const o=document.createElement('option');
@@ -83,7 +83,6 @@ function render(){
    card.className='card';
    card.setAttribute('role','button');
    card.setAttribute('tabindex','0');
-   card.setAttribute('aria-label','Reproducir '+p.title);
 
    if(p.logo){
      const img=document.createElement('img');
@@ -117,10 +116,7 @@ function render(){
 
    card.addEventListener('click',()=>ver(p));
    card.addEventListener('keydown',e=>{
-     if(e.key==='Enter' || e.key===' '){
-       e.preventDefault();
-       ver(p);
-     }
+     if(e.key==='Enter' || e.key===' '){ e.preventDefault(); ver(p); }
    });
 
    catalogo.appendChild(card);
@@ -130,25 +126,30 @@ function render(){
 }
 
 function ver(p){
- document.getElementById('tituloVideo').textContent=p.title;
- err.textContent='Reproduciendo…';
-
+ tituloVideo.textContent=p.title;
+ err.textContent='Cargando…';
  video.pause();
  video.removeAttribute('src');
  video.load();
 
+ // Reproducción directa dentro del reproductor HTML5/WebView de la app.
  video.src=p.url;
  modal.style.display='block';
 
- // La reproducción nace directamente del toque de la película.
- // No se silencia el video: el audio queda habilitado.
- const intento=video.play();
-
- if(intento && typeof intento.catch==='function'){
-   intento.catch(()=>{
-     err.textContent='No se pudo iniciar este archivo dentro del reproductor de la aplicación. Puede deberse al formato del video o a la compatibilidad del reproductor.';
+ const iniciar=()=>{
+   video.play().then(()=>{
+     err.textContent='';
+   }).catch(()=>{
+     err.textContent='No se pudo iniciar automáticamente. Tocá ▶ en los controles del reproductor.';
    });
- }
+ };
+
+ video.addEventListener('loadedmetadata',iniciar,{once:true});
+ video.addEventListener('error',()=>{
+   err.textContent='No se pudo reproducir este archivo. El servidor o el formato del video puede no ser compatible con el reproductor de la aplicación.';
+ },{once:true});
+
+ video.load();
 }
 
 function cerrar(){
@@ -158,17 +159,13 @@ function cerrar(){
  modal.style.display='none';
 }
 
-buscar.addEventListener('input',render);
-grupos.addEventListener('change',render);
-
 modal.addEventListener('click',e=>{
  if(e.target===modal) cerrar();
 });
 
-document.addEventListener('keydown',e=>{
- if(e.key==='Escape') cerrar();
-});
-
+buscar.addEventListener('input',render);
+grupos.addEventListener('change',render);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar();});
 render();
 </script>
 </body>
