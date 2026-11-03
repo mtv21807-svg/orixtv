@@ -43,7 +43,7 @@ video{width:100%;max-height:70vh;background:#000;display:block}
   <p class="ayuda">Si el video no se ve aquí, usá el botón de abajo para abrirlo en el reproductor del celular.</p>
   <p id="err">Si no reproduce, puede que el servidor no permita el acceso o que el navegador no admita el formato.</p>
   <button class="cerrar" onclick="cerrar()">Cerrar</button>
-  <a id="abrir" class="enlace" target="_blank" rel="noopener">▶ Reproducir en el celular (abrir video)</a>
+  <a id="abrir" class="enlace" target="_self">▶ Reproducir con VLC (con sonido)</a>
  </div>
 </div>
 <script>
@@ -71,14 +71,25 @@ function render(){
   }else{const n=document.createElement('div');n.className='noPoster';n.textContent='🎬';card.appendChild(n)}
   const title=document.createElement('div');title.className='titulo';title.textContent=p.title;card.appendChild(title);
   const group=document.createElement('div');group.className='grupo';group.textContent=p.group;card.appendChild(group);
-  const b=document.createElement('button');b.textContent='▶ Reproducir';b.onclick=()=>ver(p);card.appendChild(b);
+  const b=document.createElement('a');
+  b.className='enlace';
+  b.textContent='▶ Reproducir con VLC (con sonido)';
+  b.href='intent://'+p.url.substring(p.url.indexOf('://')+3)+
+    '#Intent;scheme='+p.url.split(':')[0]+
+    ';type=video/x-matroska;package=org.videolan.vlc;'+
+    'S.browser_fallback_url='+encodeURIComponent(p.url)+';end';
+  b.target='_self';
+  card.appendChild(b);
   catalogo.appendChild(card);
  });
  estado.textContent=`${lista.length} de ${peliculas.length} películas`;
 }
 function ver(p){
  document.getElementById('tituloVideo').textContent=p.title;
- document.getElementById('abrir').href=p.url;
+ document.getElementById('abrir').href='intent://'+p.url.substring(p.url.indexOf('://')+3)+
+  '#Intent;scheme='+p.url.split(':')[0]+
+  ';type=video/x-matroska;package=org.videolan.vlc;'+
+  'S.browser_fallback_url='+encodeURIComponent(p.url)+';end';
  err.textContent='Intentando reproducir… Si no funciona, el servidor puede estar caído, bloquear el acceso o usar un formato no compatible con el navegador.';
  video.pause();video.removeAttribute('src');video.load();
  video.src=p.url;
@@ -91,4 +102,4 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar()});
 render();
 </script>
 </body>
- </html>
+</html>
