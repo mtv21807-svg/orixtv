@@ -60,17 +60,9 @@ function render(){
   const group=document.createElement('div');group.className='grupo';group.textContent=p.group;card.appendChild(group);
   const b=document.createElement('a');
   b.className='enlace';
-  b.textContent='▶ Reproducir con sonido';
-  if (/\.mkv($|[?#])/i.test(p.url)) {
-   const scheme=p.url.split(':')[0];
-   const rest=p.url.replace(/^https?:\/\//i,'');
-   // Entrega el MKV al reproductor multimedia de Android; no fuerza VLC.
-   b.href='intent://'+rest+'#Intent;scheme='+scheme+';action=android.intent.action.VIEW;type=video/x-matroska;category=android.intent.category.DEFAULT;S.browser_fallback_url='+encodeURIComponent(p.url)+';end';
-   b.target='_self';
-  } else {
-   b.href=p.url;
-   b.target='_blank';
-  }
+  b.textContent='▶ Reproducir en el celular';
+  b.href=p.url.startsWith('http') ? ('intent://'+p.url.replace(/^https?:\\/\\//,'')+'#Intent;scheme='+p.url.split(':')[0]+';type=video/x-matroska;S.browser_fallback_url='+encodeURIComponent(p.url)+';end') : p.url;
+  b.target='_self';
   card.appendChild(b);
   catalogo.appendChild(card);
  });
