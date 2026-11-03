@@ -18,7 +18,7 @@ main{padding:14px}#catalogo{display:grid;grid-template-columns:repeat(auto-fill,
 .noPoster{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;background:#292a32;font-size:45px}
 .titulo{padding:9px 9px 4px;font-size:14px;line-height:1.35;overflow-wrap:anywhere;min-height:52px}
 .grupo{padding:0 9px 8px;font-size:11px;color:#aaa}
-button,.enlace{display:block;text-align:center;margin:0 9px 9px;width:calc(100% - 18px);padding:10px;border:0;border-radius:7px;background:#e50914;color:white;font-weight:bold;text-decoration:none;cursor:pointer}
+button,.ayuda{font-size:14px;color:#d0d0d0;line-height:1.4;margin:10px 0}.enlace{display:block;text-align:center;margin:0 9px 9px;width:calc(100% - 18px);padding:10px;border:0;border-radius:7px;background:#e50914;color:white;font-weight:bold;text-decoration:none;cursor:pointer}
 #modal{display:none;position:fixed;inset:0;z-index:8;background:#000e;padding:12px;overflow:auto}
 .caja{max-width:1000px;margin:3vh auto;background:#17181d;padding:12px;border-radius:10px}
 video{width:100%;max-height:70vh;background:#000;display:block}
@@ -40,9 +40,10 @@ video{width:100%;max-height:70vh;background:#000;display:block}
  <div class="caja">
   <h2 id="tituloVideo">Película</h2>
   <video id="video" controls playsinline preload="metadata"></video>
+  <p class="ayuda">Si el video no se ve aquí, usá el botón de abajo para abrirlo en el reproductor del celular.</p>
   <p id="err">Si no reproduce, puede que el servidor no permita el acceso o que el navegador no admita el formato.</p>
   <button class="cerrar" onclick="cerrar()">Cerrar</button>
-  <a id="abrir" class="enlace" target="_blank" rel="noopener">Abrir enlace de origen</a>
+  <a id="abrir" class="enlace" target="_blank" rel="noopener">▶ Reproducir en el celular (abrir video)</a>
  </div>
 </div>
 <script>
@@ -82,7 +83,7 @@ function ver(p){
  video.pause();video.removeAttribute('src');video.load();
  video.src=p.url;
  modal.style.display='block';
- video.play().then(()=>{err.textContent=''}).catch(()=>{err.textContent='No se pudo iniciar automáticamente. Tocá Play. Si sigue sin reproducir, el enlace de origen puede no estar disponible o el formato puede no ser compatible.'});
+ video.play().then(()=>{err.textContent=''}).catch(()=>{err.textContent='Este formato MKV puede no reproducirse dentro de la página. Tocá “Reproducir en el celular (abrir video)” para abrir el enlace en el reproductor del teléfono.'});
 }
 function cerrar(){video.pause();video.removeAttribute('src');video.load();modal.style.display='none'}
 buscar.addEventListener('input',render);grupos.addEventListener('change',render);
@@ -90,4 +91,4 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar()});
 render();
 </script>
 </body>
-</html>
+ </html>
